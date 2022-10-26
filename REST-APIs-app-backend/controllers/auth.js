@@ -1,5 +1,5 @@
 const User = require('../models/user');
-const { validationResult } = require('express-validator/checks');
+const { validationResult } = require('express-validator/check');
 const bcrypt = require('bcryptjs');
 
 
@@ -32,4 +32,4 @@ exports.signup = (req, res, next) => {
         }
         next(err);
     });
-}
+};
