@@ -11,41 +11,32 @@ const authRoutes = require('./routes/auth');
 
 const app = express();
 
-// const fileStorage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, 'images');
-//   },
-//   filename: (req, file, cb) => {
-//     cb(null, new Date().toISOString() + '-' + file.originalname);
-//   }
-// });
-
-
- 
-const storage = multer.diskStorage({
-    destination: function(req, file, cb) {
-        cb(null, 'images');
-    },
-    filename: function(req, file, cb) {
-        cb(null, uuidv4())
-    }
+const fileStorage = multer.diskStorage({
+  destination: function(req, file, cb) {
+      cb(null, 'images');
+  },
+  filename: function(req, file, cb) {
+      cb(null, uuidv4())
+  }
 });
 
 const fileFilter = (req, file, cb) => {
-  if(
+  if (
     file.mimetype === 'image/png' ||
-    file.mimetype === 'image/jpeg' ||
-    file.mimetype === 'image/jpg' 
-  ){
+    file.mimetype === 'image/jpg' ||
+    file.mimetype === 'image/jpeg'
+  ) {
     cb(null, true);
   } else {
     cb(null, false);
   }
-}
+};
 
 // app.use(bodyParser.urlencoded()); // x-www-form-urlencoded <form>
 app.use(bodyParser.json()); // application/json
-app.use(multer({storage: storage, fileFilter: fileFilter}).single('image'));
+app.use(
+  multer({ storage: fileStorage, fileFilter: fileFilter }).single('image')
+);
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use((req, res, next) => {
@@ -69,8 +60,8 @@ app.use((error, req, res, next) => {
   res.status(status).json({ message: message, data: data });
 });
 
-
-mongoose.connect('mongodb+srv://muhammeddilmacc:muhammed123@cluster0.2wjtvvo.mongodb.net/messages?retryWrites=true&w=majority')
+mongoose.connect('mongodb+srv://muhammeddilmacc:muhammed123@cluster0.2wjtvvo.mongodb.net/messages?retryWrites=true&w=majority',
+ { useUnifiedTopology: true, useNewUrlParser: true })
   .then(result => {
     app.listen(8080);
   })

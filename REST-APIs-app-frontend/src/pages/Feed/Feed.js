@@ -22,7 +22,11 @@ class Feed extends Component {
   };
 
   componentDidMount() {
-    fetch('URL')
+    fetch('http://localhost:8080/auth/status', {
+      headers: {
+        Authorization: 'Bearer ' + this.props.token
+      }
+    })
       .then(res => {
         if (res.status !== 200) {
           throw new Error('Failed to fetch user status.');
@@ -63,10 +67,10 @@ class Feed extends Component {
       })
       .then(resData => {
         this.setState({
-          posts: resData.posts.map(posts => {
+          posts: resData.posts.map(post => {
             return {
-              ...posts,
-              imagePath: posts.imageUrl
+              ...post,
+              imagePath: post.imageUrl
             };
           }),
           totalPosts: resData.totalItems,
@@ -78,7 +82,16 @@ class Feed extends Component {
 
   statusUpdateHandler = event => {
     event.preventDefault();
-    fetch('URL')
+    fetch('http://localhost:8080/auth/status', {
+      method: 'PATCH',
+      headers: {
+        Authorization: 'Bearer ' + this.props.token,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        status: this.state.status
+      })
+    })
       .then(res => {
         if (res.status !== 200 && res.status !== 201) {
           throw new Error("Can't update status!");
@@ -114,7 +127,6 @@ class Feed extends Component {
     this.setState({
       editLoading: true
     });
-    // Set up data (with image!)
     const formData = new FormData();
     formData.append('title', postData.title);
     formData.append('content', postData.content);
@@ -128,7 +140,10 @@ class Feed extends Component {
 
     fetch(url, {
       method: method,
-      body: formData
+      body: formData,
+      headers: {
+        Authorization: 'Bearer ' + this.props.token
+      }
     })
       .then(res => {
         if (res.status !== 200 && res.status !== 201) {
@@ -181,7 +196,10 @@ class Feed extends Component {
   deletePostHandler = postId => {
     this.setState({ postsLoading: true });
     fetch('http://localhost:8080/feed/post/' + postId, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: {
+        Authorization: 'Bearer ' + this.props.token
+      }
     })
       .then(res => {
         if (res.status !== 200 && res.status !== 201) {
